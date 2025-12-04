@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>View Users</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 15px; }
+    th, td { border: 1px solid #ccc; padding: 8px; }
+    th { background: #eee; }
+    button { padding: 10px 15px; }
+    #msg { color: red; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <h2>All Registered Users</h2>
+
+  <label>Admin Token:</label>
+  <input id="token" value="devtoken" style="padding: 6px;">
+  <button onclick="loadUsers()">Show Users</button>
+
+  <p id="msg"></p>
+  <div id="output"></div>
+
+<script>
+async function loadUsers() {
+  const token = document.getElementById("token").value;
+  const msg = document.getElementById("msg");
+  const out = document.getElementById("output");
+
+  msg.textContent = "Loading...";
+  out.innerHTML = "";
+
+  try {
+    const res = await fetch("http://127.0.0.1:5000/users", {
+      headers: { "X-Admin-Token": token }
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      msg.textContent = data.error || "Access denied (wrong token)";
+      return;
+    }
+
+    msg.textContent = "";
+
+    let html = "<table><tr><th>ID</th><th>Email</th><th>Created</th></tr>";
+
+    data.users.forEach(u => {
+      html += `<tr>
+        <td>${u.id}</td>
+        <td>${u.email}</td>
+        <td>${u.created_at}</td>
+      </tr>`;
+    });
+
+    html += "</table>";
+    out.innerHTML = html;
+
+  } catch (err) {
+    msg.textContent = "Error: " + err.message;
+  }
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CyberGuard - Phishing Detection</title>
+  <link rel="stylesheet" href="pjt.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Small additions for landing & nav user area */
+    .landing-overlay {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(5,10,20,0.98), rgba(2,6,12,0.98));
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 20000;
+      padding: 20px;
+    }
+    .landing-card {
+      width: 920px;
+      max-width: 100%;
+      background: #0d0f16;
+      border: 1px solid #00ffff;
+      padding: 28px;
+      border-radius: 12px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .landing-left { padding: 10px; }
+    .landing-right { padding: 10px; display:flex; align-items:center; justify-content:center; flex-direction:column; }
+    .brand { font-size: 28px; font-weight:700; color:#00ffff; margin-bottom:6px; }
+    .lead { color:#cfefff; margin-bottom:14px; }
+    .tab-buttons { display:flex; gap:10px; margin-bottom:12px; }
+    .tab-buttons button { padding:10px 14px; border-radius:8px; border:1px solid #00ffff; background:transparent; color:#fff; cursor:pointer; }
+    .tab-buttons button.active { background:#00ffff; color:#000; border-color:#00ffff; }
+    .auth-form { width:100%; }
+    .auth-form input { width:100%; padding:10px; margin-bottom:8px; border-radius:8px; border:1px solid #00ffff; background:#111; color:#fff; }
+    .auth-form button { width:100%; padding:12px; border-radius:8px; border:none; background:linear-gradient(90deg,#00ffff,#ff6b6b); color:#000; font-weight:600; cursor:pointer; }
+    .small-note { font-size:13px; color:#9fbecf; margin-top:8px; }
+    .hidden { display:none !important; }
+    .nav-user { display:none; gap:12px; align-items:center; margin-left:12px; }
+    .nav-user #userEmail { font-weight:600; color:#cfefff; }
+    .nav-user button { padding:8px 12px; border-radius:8px; border:none; background:linear-gradient(90deg,#ff6b6b,#00ffff); color:#000; font-weight:600; cursor:pointer; }
+    @media (max-width:860px) { .landing-card { grid-template-columns: 1fr; padding:18px; } }
+  </style>
+</head>
+<body>
+
+<!-- Landing overlay: login/register (shown on page load unless logged in) -->
+<div id="landing" class="landing-overlay">
+  <div class="landing-card">
+    <div class="landing-left">
+      <div class="brand">🛡️ CyberGuard</div>
+      <div class="lead">Login to <i>Experience</i> our Detection System.</div>
+
+      <div class="tab-buttons">
+        <button id="tabLogin" class="active">Login</button>
+        <button id="tabRegister">Register</button>
+      </div>
+
+      <!-- Login form -->
+      <form id="landingLoginForm" class="auth-form">
+        <input id="landingLoginEmail" type="email" placeholder="Email" required />
+        <input id="landingLoginPassword" type="password" placeholder="Password" required />
+        <button type="submit">Login</button>
+        <div id="landingLoginMsg" class="small-note"></div>
+      </form>
+
+      <!-- Register form -->
+      <form id="landingRegisterForm" class="auth-form hidden">
+        <input id="landingRegisterEmail" type="email" placeholder="Email" required />
+        <input id="landingRegisterPassword" type="password" placeholder="Password (min 6)" required />
+        <input id="landingRegisterPassword2" type="password" placeholder="Confirm Password" required />
+        <button type="submit">Create account</button>
+        <div id="landingRegisterMsg" class="small-note"></div>
+      </form>
+    </div>
+
+    <div class="landing-right">
+      <img src="https://i.pinimg.com/736x/1e/e4/55/1ee455d647c0301c53e4949b0309809c.jpg" width="240" height="240" alt="Shield" style="border-radius:12px; margin-bottom:12px;">
+      <div style="text-align:center;">
+        <div style="font-weight:700; margin-bottom:6px;">Welcome to CyberGuard</div>
+        <div class="small-note">Now the website is yours...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Main site (hidden until login) -->
+<div id="appContent" style="visibility:hidden;">
+
+  <!-- Navigation -->
+  <nav>
+    <div class="logo">🛡️ CyberGuard</div>
+
+    <div style="display:flex; align-items:center;">
+      <div class="nav-links" id="navLinks">
+        <a href="#hero">Home</a>
+        <a href="#features">Features</a>
+        <a href="#scan">Scan Email</a>
+        <a href="#team">Team</a>
+        <a href="#clients">Clients</a>
+      </div>
+
+      <!-- Sign in/up links (hidden when signed in) -->
+      <div style="margin-left:20px;">
+        <a href="#" id="loginBtnNav">Sign In</a>
+        <a href="#" id="RegisterBtnNav" style="margin-left:12px;">Sign Up</a>
+      </div>
+
+      <!-- Profile / Logout (shown when signed in) -->
+      <div class="nav-user" id="navUserArea">
+        <span id="userEmail"></span>
+        <button id="logoutBtn">Logout</button>
+      </div>
+    </div>
+
+    <div class="hamburger" id="hamburger" style="margin-left:auto;">
+      <div></div><div></div><div></div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero fade-in" id="hero">
+    <div class="hero-content">
+      <h1>Secure Your Emails Instantly</h1>
+      <p>Protect your inbox with CyberGuards advanced phishing detection. Stay safe, always.</p>
+     <style>
+/* Container */
+.slider {
+  width: 100%;
+  overflow: hidden;
+  background: #0f111a;
+  padding: 20px 0;
+}
+
+/* Moving images wrapper */
+.slide-track {
+  display: flex;
+  width: calc(200px * 10); /* 10 images × width */
+  animation: moveRight 20s linear infinite;
+}
+
+/* Images */
+.slide-track img {
+  width: 200px;
+  height: 150px;
+  margin-right: 20px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+/* Keyframes — move L → R → restart */
+@keyframes moveRight {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+</style>
+</head>
+<body>
+
+<div class="slider">
+  <div class="slide-track">
+
+    <!-- 10 images -->
+      <img  src="https://i.pinimg.com/736x/98/42/df/9842df0b569c38d81f33dd0d6ec66829.jpg" height="300" width="300" >
+      <img  src="https://i.pinimg.com/736x/32/6f/2c/326f2cbd13a735bed0894428d0ffec8d.jpg" height="300" width="300" >
+      <img  src="https://i.pinimg.com/736x/65/1b/61/651b6112dbb6efae9533202db7663b5c.jpg" height="300" width="300" >
+      <img  src="https://i.pinimg.com/736x/08/9a/47/089a47a625e86d878b35c75678d14ec3.jpg" height="300" width="300" >
+      <img  src="https://i.pinimg.com/1200x/b1/d2/bf/b1d2bf07e20e72f852c6d98b17f9d0cb.jpg" height="300" width="300" >
+      <img  src="https://i.pinimg.com/736x/e2/c3/99/e2c3992aed9f735d76fa73745343f8c2.jpg" height="300" width="300">
+      <img src="https://i.pinimg.com/1200x/a0/10/b0/a010b01e1e632d2266f579bcd4467380.jpg" height="300" width="300" >
+      <img  src="https://i.pinimg.com/736x/c5/36/93/c5369326846c59fd288aea28470cece6.jpg" height="300" width="300">
+      <img  src="https://i.pinimg.com/1200x/a4/95/07/a495072886b57aa9b236552e78b5e045.jpg" height="300" width="300">
+      <img  src="https://i.pinimg.com/1200x/43/3e/ef/433eef1c28b030f7736092123936f854.jpg" height="300" width="300" >
+      <img  src="https://i.pinimg.com/736x/98/42/df/9842df0b569c38d81f33dd0d6ec66829.jpg" height="300" width="300" >
+      <img  src="https://i.pinimg.com/736x/32/6f/2c/326f2cbd13a735bed0894428d0ffec8d.jpg" height="300" width="300" >
+      <img  src="https://i.pinimg.com/736x/65/1b/61/651b6112dbb6efae9533202db7663b5c.jpg" height="300" width="300" >
+      <img  src="https://i.pinimg.com/736x/08/9a/47/089a47a625e86d878b35c75678d14ec3.jpg" height="300" width="300" >
+      <img  src="https://i.pinimg.com/1200x/b1/d2/bf/b1d2bf07e20e72f852c6d98b17f9d0cb.jpg" height="300" width="300" >
+      <img  src="https://i.pinimg.com/736x/e2/c3/99/e2c3992aed9f735d76fa73745343f8c2.jpg" height="300" width="300">
+      <img src="https://i.pinimg.com/1200x/a0/10/b0/a010b01e1e632d2266f579bcd4467380.jpg" height="300" width="300" >
+      <img  src="https://i.pinimg.com/736x/c5/36/93/c5369326846c59fd288aea28470cece6.jpg" height="300" width="300">
+      <img  src="https://i.pinimg.com/1200x/a4/95/07/a495072886b57aa9b236552e78b5e045.jpg" height="300" width="300">
+      <img  src="https://i.pinimg.com/1200x/43/3e/ef/433eef1c28b030f7736092123936f854.jpg" height="300" width="300" >
+      
+ 
+
+  </div>
+</div>
+ <br>
+      <button onclick="document.getElementById('scan').scrollIntoView({behavior:'smooth'});">Get Started</button>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="features fade-in" id="features">
+    <h2>Features</h2>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h3>Real-Time Analysis</h3>
+        <p>Detect phishing emails which you have pasted in inbox</p>
+      </div>
+      <div class="feature-card">
+        <h3>URL Scanning</h3>
+        <p>Scans all links for malicious content results the Risk</p>
+      </div>
+      <div class="feature-card">
+        <h3>Advanced Security</h3>
+        <p>AI-powered detection ensures protection against evolving threats.</p>
+      </div>
+    </div>
+  </section>
+
+<!-- Scan Email (REPLACED: single input for both email text & URL) -->
+<section class="scan fade-in" id="scan">
+  <h2>Try Our Detection System</h2>
+
+  <!-- Single textarea for email body or a URL -->
+  <textarea id="inputBox"
+    placeholder="Paste full email text here — or paste a suspicious URL. The scanner will auto-detect any link and extract it."
+    style="width:80%; max-width:700px; height:220px; padding:12px; border-radius:10px; border:2px solid #00ffff; background:#111; color:#fff; font-size:15px;"></textarea>
+
+  <div style="margin-top:10px; text-align:left; width:80%; max-width:700px;">
+    <label style="color:#9fbecf; font-size:14px;">Detected URL (first):</label>
+    <div id="detectedUrl" style="min-height:24px; color:#cfefff; font-weight:600; margin-top:6px;">(none detected)</div>
+    <div id="detectedUrlList" style="margin-top:8px; color:#9fbecf; font-size:13px;"></div>
+  </div>
+
+  <div style="margin-top:14px;">
+    <button id="scanBtn" style="padding:12px 22px; border-radius:10px; border:none; background:linear-gradient(90deg,#00ffff,#ff6b6b); color:#000; font-weight:600;">Analyze</button>
+    <button id="clearBtn" style="padding:10px 16px; margin-left:12px; border-radius:10px; border:1px solid #00ffff; background:transparent; color:#fff;">Clear</button>
+  </div>
+</section>
+
+
+  <!-- Modal for scan results -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <span class="closeBtn">&times;</span>
+      <h2 >Analysis Result</h2>
+      <pre id="resultText"  style="white-space:pre-wrap; text-align:left;"></pre>
+    </div>
+  </div>
+
+<!-- Team Section -->
+<section class="team fade-in" id="team">
+  <h2>Meet Our CyberExperts</h2>
+  <div class="team-grid">
+    <div class="team-card">
+      <img src="https://media.licdn.com/dms/image/v2/D5603AQFgpuDve7t-qA/profile-displayphoto-scale_400_400/B56ZneCUrtKUAg-/0/1760366777677?e=1766016000&v=beta&t=Kv6JNtOChK3a8lgrf0hQOZIOL8JakLCMjcpwho3gqaQ" alt="Lokesh Goud">
+      <h3>Lokesh Goud</h3>
+      <p>Lead CyberSecurity Analyst</p>
+    </div>
+    <div class="team-card">
+      <img src="https://media.licdn.com/dms/image/v2/D5603AQEsq_NpIMawOw/profile-displayphoto-scale_400_400/B56ZnX0REjG0Ag-/0/1760262430075?e=1766620800&v=beta&t=TgYSKKFcUXIWld_qj-2qVDpjO2WUi_U4QNP8uA6jJa0" alt="Altaj Mohammed">
+      <h3>Altaj Mohammed</h3>
+      <p>CyberSecurity Expert</p>
+    </div>
+    <div class="team-card">
+      <img src="https://media.licdn.com/dms/image/v2/D4D03AQFG-3QkyaJ1cw/profile-displayphoto-scale_400_400/B4DZrdSbFxJcAg-/0/1764649187199?e=1766016000&v=beta&t=6HolWp6iaMtQDm-mfBiSyQZL0FRJUD3J-tY1X1WWVLg" alt="Polishetty Akhil Anthony">
+      <h3>Polishetty Akhil Anthony</h3>
+      <p>Phishing Analyst</p>
+    </div>
+  </div>
+</section>
+
+<!-- Clients Section -->
+<section class="clients fade-in" id="clients">
+  <center><h2>Meet our Clients</h2></center>
+  <div class="slider">
+ <style>
+
+.slider {
+  width: 100%;
+  overflow: hidden;
+  background: #0f111a;
+  padding: 20px 0;
+}
+
+.slide-track {
+  display: flex;
+  gap: 30px;
+  animation: moveRight 25s linear infinite;
+}
+
+/* image sizes (same as you provided) */
+.slide-track img {
+  width: 1000px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+/* Animation: LEFT → RIGHT infinite */
+@keyframes moveRight {
+  0%   { transform: translateX(-50%); }
+  100% { transform: translateX(0%); }
+}
+
+</style>
+</head>
+<body>
+
+<div class="slider">
+  <div class="slide-track">
+
+    <!-- ORIGINAL 4 images -->
+    <img src="https://image-optimizer.cyberriskalliance.com/unsafe/1920x0/https://files.cyberriskalliance.com/wp-content/uploads/2023/08/cofense.jpg">
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcCyQPwIzve4gpZCy_HeCH8z6MKNb6c7q38g&s">
+    <img src="https://thumbs.dreamstime.com/b/barracuda-fish-logo-icon-designs-vector-illustration-simple-style-130486168.jpg">
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfKHqRydy_iAFZh1dunNlXxxgjvP3DYbvuyA&s">
+
+    <!-- DUPLICATED 4 images for seamless continuous loop -->
+    <img src="https://image-optimizer.cyberriskalliance.com/unsafe/1920x0/https://files.cyberriskalliance.com/wp-content/uploads/2023/08/cofense.jpg">
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcCyQPwIzve4gpZCy_HeCH8z6MKNb6c7q38g&s">
+    <img src="https://thumbs.dreamstime.com/b/barracuda-fish-logo-icon-designs-vector-illustration-simple-style-130486168.jpg">
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfKHqRydy_iAFZh1dunNlXxxgjvP3DYbvuyA&s">
+
+  </div>
+
+</section>
+
+
+  <footer>
+    <p>🌐 2025 CyberGuard Security. All Rights Reserved.</p>
+  </footer>
+
+</div>
+
+<script src="pjt.js"></script>
+</body>
+</html>
