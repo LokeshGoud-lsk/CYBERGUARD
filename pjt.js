@@ -1,6 +1,6 @@
 // pjt.js - single input box (inputBox) for both email text & URL
 // Keep pjt.html and pjt.css unchanged. Backend still expects { email, url } on /analyze
-const API_BASE = "http://127.0.0.1:5000";
+const API_BASE = "https://lokeshgoud-lsk.github.io/CYBERGUARD/";
 
 /* ---------- Small helper ---------- */
 function showMsg(el, msg, success = false) {
